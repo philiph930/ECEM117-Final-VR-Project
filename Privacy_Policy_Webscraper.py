@@ -4,10 +4,11 @@ from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import csv
 import time
 def get_game_links(base_url):
     # Set up the Selenium WebDriver with the Service class
-    service = Service('/Users/billchen/Documents/fall2024/Security/geckodriver')
+    service = Service('GeckoDriver')
     driver = webdriver.Firefox(service=service)
     driver.get(base_url)
     
@@ -25,7 +26,7 @@ def get_game_links(base_url):
 
 def fetch_policy_link(game_url):
     # Set up Selenium WebDriver to handle dynamic content
-    service = Service('/Users/billchen/Documents/fall2024/Security/geckodriver')
+    service = Service('GeckoDriver')
     driver = webdriver.Firefox(service=service)
     driver.get(game_url)
     
@@ -48,7 +49,7 @@ def analyze_policy(policy_url):
         policy_url = f"https://{policy_url.lstrip('/')}"  # Handle relative links
     
     # Use Selenium to fetch the policy page
-    service = Service('/Users/billchen/Documents/fall2024/Security/geckodriver')
+    service = Service('GeckoDriver')
     driver = webdriver.Firefox(service=service)
     driver.get(policy_url)
     
@@ -82,6 +83,7 @@ def analyze_policy(policy_url):
 base_url = 'https://www.meta.com/experiences/section/891919991406810'
 game_links = get_game_links(base_url)
 results = []
+numeric_results = {}
 
 for game in game_links:
     full_game_url = f"https://www.meta.com{game}"
@@ -89,10 +91,18 @@ for game in game_links:
     if policy_url:
         status = analyze_policy(policy_url)
         results.append({'Game': game, 'Status': status})
+        if status == "Collected and Secured":
+            numeric_results[game] = [game, 2]
+        else:
+            numeric_results[game] = [game, 1]
         time.sleep(1)  # Be polite to the server
     else:
         results.append({'Game': game, 'Status': 'No Policy Found'})
+        numeric_results[game] = [game, 0]
 
 # Print results or export to CSV
-for result in results:
-    print(result)
+with open('output.csv', 'w', newline="") as file:    
+    for result in results:
+        writer = csv.writer(file)
+        writer.writerow( numeric_results[result['Game']])
+        print(result)
