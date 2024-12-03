@@ -49,11 +49,11 @@ def get_directories(base_url):
 
 #this function is what looks for the data in each url
 def get_motion_data(url_list):
-    keywords = ["motion", "hand", "Hand", "Control", "Rayvision"] #update keywords
+    keywords = ["motion", "hand", "Hand", "Control", "Rayvision","data","images", "control", "tracking"] #update keywords
     for i in url_list:
         if any(keyword in i for keyword in keywords):
-            return 0
-    return 1
+            return 1
+    return 0
 
 # Scrape and analyze all github repositories
 base_url = 'https://meta-guide.com/software/100-best-github-virtual-reality'
@@ -66,21 +66,21 @@ for repo in github_repos:
 
 #uncomment once you are ready to go over the 100 github directories
 for repo in github_repos: #list is in url for each entry
-    # directories = get_directories(repo)
-    # if get_motion_data(directories):
-    #   numeric_results[repo] = [repo, 0]
-    # else:
-    #   numeric_results[repo] = [repo, 1]
+    directories = get_directories(repo)
+    if get_motion_data(directories):
+        numeric_results[repo] = [repo, 1]
+    else:
+       numeric_results[repo] = [repo, 0]
     print(repo) #comment this out once you are done
     
     
 #test repo, comment out 
-repo = "https://github.com/dilmerv/VRDraw"
-directories = get_directories(repo)
-if get_motion_data(directories):
-    numeric_results[repo] = [repo, 1]
-else:
-    numeric_results[repo] = [repo, 1]
+#repo = "https://github.com/dilmerv/VRDraw"
+#directories = get_directories(repo)
+#if get_motion_data(directories):
+#    numeric_results[repo] = [repo, 1]
+#else:
+#    numeric_results[repo] = [repo, 0]
 
     
 #writing to csv file
